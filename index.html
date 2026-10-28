@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Together AI — System Status</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            400: '#60a5fa',
+            500: '#3b82f6',
+            600: '#2563eb'
+          }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  @keyframes pulseSoft {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .55; transform: scale(.92); }
+  }
+  .pulse-dot { animation: pulseSoft 1.8s ease-in-out infinite; }
+  .fade-in { animation: fadeIn .35s ease-out both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .ring-glow-success { box-shadow: 0 0 0 4px rgba(34,197,94,.12), 0 0 40px rgba(34,197,94,.18); }
+  .ring-glow-error { box-shadow: 0 0 0 4px rgba(239,68,68,.12), 0 0 40px rgba(239,68,68,.18); }
+</style>
+</head>
+<body class="min-h-screen bg-gray-900 text-gray-100 antialiased">
+  <div class="relative min-h-screen flex flex-col overflow-hidden">
+    <!-- Ambient background -->
+    <div class="pointer-events-none absolute inset-0 overflow-hidden">
+      <div class="absolute -top-40 -left-32 h-96 w-96 rounded-full bg-brand-600/20 blur-3xl"></div>
+      <div class="absolute -bottom-48 -right-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(17,24,39,0.6)_100%)]"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-10 border-b border-gray-800/70 backdrop-blur-sm">
+      <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <div class="flex items-center gap-3">
+          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-600 shadow-lg shadow-brand-600/30">
+            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-sm font-semibold tracking-wide text-gray-100">Together AI</h1>
+            <p class="text-[11px] text-gray-500">System Status Check</p>
+          </div>
+        </div>
+        <span class="hidden sm:inline-flex items-center gap-2 rounded-full border border-gray-700/70 bg-gray-800/50 px-3 py-1 text-[11px] font-medium text-gray-400">
+          <span class="relative flex h-2 w-2">
+            <span class="absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75 pulse-dot"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-brand-400"></span>
+          </span>
+          Live monitoring
+        </span>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="relative z-10 flex flex-1 items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md">
+        <!-- Card -->
+        <div id="statusCard" class="fade-in rounded-2xl border border-gray-800 bg-gray-800/60 p-8 shadow-2xl shadow-black/40 backdrop-blur-md transition-all duration-300">
+          <!-- Loading state -->
+          <div id="loadingState" class="flex flex-col items-center text-center">
+            <div class="relative mb-6 flex h-16 w-16 items-center justify-center">
+              <div class="absolute inset-0 rounded-full border-2 border-gray-700"></div>
+              <div class="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-brand-500"></div>
+              <svg class="h-6 w-6 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+            </div>
+            <h2 class="text-lg font-semibold text-gray-100">Checking system health</h2>
+            <p class="mt-1.5 text-sm text-gray-400">Verifying service dependencies…</p>
+            <div class="mt-6 h-1 w-full overflow-hidden rounded-full bg-gray-700/60">
+              <div class="h-full w-1/2 animate-pulse rounded-full bg-gradient-to-r from-brand-500 to-brand-400"></div>
+            </div>
+          </div>
+
+          <!-- Success state -->
+          <div id="successState" class="hidden flex-col items-center text-center">
+            <div class="ring-glow-success mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/10">
+              <svg class="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+            </div>
+            <div class="mb-2 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 pulse-dot"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+              </span>
+              Operational
+            </div>
+            <h2 class="text-lg font-semibold text-gray-100">All systems operational</h2>
+            <p class="mt-1.5 text-sm text-gray-400">The service checked out healthy and dependencies are reachable.</p>
+
+            <dl class="mt-6 w-full space-y-2 rounded-xl border border-gray-700/60 bg-gray-900/50 p-4 text-left">
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-xs font-medium uppercase tracking-wider text-gray-500">Service</dt>
+                <dd id="serviceName" class="text-sm font-medium text-gray-200">—</dd>
+              </div>
+              <div class="h-px bg-gray-700/50"></div>
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-xs font-medium uppercase tracking-wider text-gray-500">Status</dt>
+                <dd id="statusValue" class="text-sm font-medium text-emerald-300">—</dd>
+              </div>
+              <div class="h-px bg-gray-700/50"></div>
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-xs font-medium uppercase tracking-wider text-gray-500">Checked</dt>
+                <dd id="timestampValue" class="text-sm font-medium text-gray-200">—</dd>
+              </div>
+            </dl>
+
+            <button id="refreshBtn" type="button" class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-200 transition hover:border-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/50">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+              </svg>
+              Re-check status
+            </button>
+          </div>
+
+          <!-- Error state -->
+          <div id="errorState" class="hidden flex-col items-center text-center">
+            <div class="ring-glow-error mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-red-500/40 bg-red-500/10">
+              <svg class="h-8 w-8 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              </svg>
+            </div>
+            <div class="mb-2 inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1 text-xs font-medium text-red-300">
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 pulse-dot"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-red-400"></span>
+              </span>
+              Unavailable
+            </div>
+            <h2 class="text-lg font-semibold text-gray-100">Unable to reach the service</h2>
+            <p id="errorMessage" class="mt-1.5 text-sm text-gray-400">The health check failed. Please try again.</p>
+
+            <button id="retryBtn" type="button" class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-400/60 focus:ring-offset-2 focus:ring-offset-gray-800">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+              </svg>
+              Retry
+            </button>
+          </div>
+        </div>
+
+        <p class="mt-6 text-center text-xs text-gray-600">
+          Endpoint: <code class="rounded bg-gray-800/70 px-1.5 py-0.5 text-gray-400">GET /api/health</code>
+        </p>
+      </div>
+    </main>
+
+    <footer class="relative z-10 border-t border-gray-800/70 py-4">
+      <p class="text-center text-xs text-gray-600">Together AI &middot; System Status Check</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const card = document.getElementById('statusCard');
+      const loadingState = document.getElementById('loadingState');
+      const successState = document.getElementById('successState');
+      const errorState = document.getElementById('errorState');
+      const serviceName = document.getElementById('serviceName');
+      const statusValue = document.getElementById('statusValue');
+      const timestampValue = document.getElementById('timestampValue');
+      const errorMessage = document.getElementById('errorMessage');
+      const retryBtn = document.getElementById('retryBtn');
+      const refreshBtn = document.getElementById('refreshBtn');
+
+      function show(state) {
+        card.classList.remove('ring-glow-success', 'ring-glow-error');
+        [loadingState, successState, errorState].forEach((el) => {
+          el.classList.add('hidden');
+          el.classList.remove('flex', 'flex-col', 'fade-in');
+        });
+        state.classList.remove('hidden');
+        state.classList.add('flex', 'flex-col', 'fade-in');
+      }
+
+      function formatTimestamp(iso) {
+        try {
+          const d = new Date(iso);
+          if (isNaN(d.getTime())) return iso;
+          return d.toLocaleString(undefined, {
+            dateStyle: 'medium',
+            timeStyle: 'medium'
+          });
+        } catch (e) {
+          return iso;
+        }
+      }
+
+      async function checkHealth() {
+        show(loadingState);
+        try {
+          const res = await fetch('/api/health', {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            cache: 'no-store'
+          });
+
+          let data = null;
+          try {
+            data = await res.json();
+          } catch (e) {
+            data = null;
+          }
+
+          if (res.ok && data && data.status === 'operational') {
+            serviceName.textContent = data.service || 'system-status-check';
+            statusValue.textContent = data.status;
+            timestampValue.textContent = formatTimestamp(data.timestamp);
+            card.classList.add('ring-glow-success');
+            show(successState);
+            return;
+          }
+
+          if (res.status === 503 && data) {
+            throw new Error('Service reported unavailable — dependencies may be down.');
+          }
+          throw new Error('Health check failed with status ' + res.status + '.');
+        } catch (err) {
+          errorMessage.textContent = err && err.message
+            ? err.message
+            : 'The health check failed. Please try again.';
+          card.classList.add('ring-glow-error');
+          show(errorState);
+        }
+      }
+
+      retryBtn.addEventListener('click', checkHealth);
+      refreshBtn.addEventListener('click', checkHealth);
+
+      checkHealth();
+    })();
+  </script>
+</body>
+</html>
